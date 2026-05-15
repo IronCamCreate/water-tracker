@@ -1,122 +1,135 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import heroImg from './assets/hero.png'
-import './App.css'
+import { useState, useEffect } from 'react';
+import './App.css';
 
-function App() {
-  const [count, setCount] = useState(0)
+export default function App() {
+  const [intakes, setIntakes] = useState([]);
+  const [todayIntake, setTodayIntake] = useState(0);
+  const [streak, setStreak] = useState(0);
+  const [goal, setGoal] = useState(100);
+
+  const today = new Date().toISOString().split('T')[0];
+
+  useEffect(() => {
+    const saved = localStorage.getItem('waterTrackerData');
+    if (saved) {
+      const data = JSON.parse(saved);
+      setIntakes(data.intakes || []);
+      setStreak(data.streak || 0);
+      setGoal(data.goal || 100);
+    }
+  }, []);
+
+  useEffect(() => {
+    const todayEntry = intakes.find(entry => entry.date === today);
+    setTodayIntake(todayEntry ? todayEntry.amount : 0);
+  }, [intakes, today]);
+
+  useEffect(() => {
+    localStorage.setItem('waterTrackerData', JSON.stringify({ intakes, streak, goal }));
+  }, [intakes, streak, goal]);
+
+  const addWater = (amount) => {
+    const todayEntry = intakes.find(entry => entry.date === today);
+    if (todayEntry) {
+      setIntakes(
+        intakes.map(entry =>
+          entry.date === today
+            ? { ...entry, amount: entry.amount + amount }
+            : entry
+        )
+      );
+    } else {
+      setIntakes([...intakes, { date: today, amount }]);
+    }
+  }; const hitGoalToday = () => {
+    return todayIntake >= goal;
+  };
+
+  const getWeeklyData = () => {
+    const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+    const result = [];
+    for (let i = 6; i >= 0; i--) {
+      const date = new Date();
+      date.setDate(date.getDate() - i);
+      const dateStr = date.toISOString().split('T')[0];
+      const entry = intakes.find(e => e.date === dateStr);
+      result.push({
+        day: days[date.getDay()],
+        amount: entry ? entry.amount : 0,
+        hitGoal: entry ? entry.amount >= goal : false,
+      });
+    }
+    return result;
+  };
+
+  const getStreak = () => {
+    let count = 0;
+    const date = new Date();
+    while (true) {
+      const dateStr = date.toISOString().split('T')[0];
+      const entry = intakes.find(e => e.date === dateStr);
+      if (entry && entry.amount >= goal) {
+        count++;
+        date.setDate(date.getDate() - 1);
+      } else {
+        break;
+      }
+    }
+    return count;
+  };
 
   return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.jsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
+    <div className="app">
+      <div className="container">
+        <header>
+          <h1>Water Tracker</h1>
+          <p className="date">{new Date(today).toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' })}</p>
+        </header>
 
-      <div className="ticks"></div>
+        <section className="progress-section">
+          <div className="progress-card">
+            <div className="intake-display">
+              <span className="intake-number">{todayIntake}</span>
+              <span className="intake-label">oz / {goal} oz</span>
+            </div>
+            <div className="progress-bar">
+              <div className="progress-fill" style={{ width: `${Math.min((todayIntake / goal) * 100, 100)}%` }}></div>
+            </div>
+          </div>
+        </section>
 
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
+        <section className="buttons-section">
+          <button onClick={() => addWater(8)}>+ 8 oz</button>
+          <button onClick={() => addWater(16)}>+ 16 oz</button>
+          <button onClick={() => addWater(32)}>+ 32 oz</button>
+          <button onClick={() => {
+            const custom = prompt('Enter amount in oz:');
+            if (custom && !isNaN(custom)) addWater(parseFloat(custom));
+          }}>Custom</button>
+        </section>
 
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
-  )
+        <section className="streak-section">
+          <div className="streak-card">
+            <span className="streak-label">Current streak</span>
+            <span className="streak-number">{getStreak()} days</span>
+          </div>
+        </section>
+
+        <section className="weekly-section">
+          <h2>This week</h2>
+          <div className="weekly-chart">
+            {getWeeklyData().map((entry, i) => (
+              <div key={i} className="bar-container">
+                <div
+                  className={`bar ${entry.hitGoal ? 'hit-goal' : ''}`}
+                  style={{ height: `${Math.max ((entry.amount / goal) * 100, 5)}%` }}
+                ></div>
+                <span className="bar-label">{entry.day}</span>
+              </div>
+            ))}
+          </div>
+        </section>
+      </div>
+    </div>
+  );
 }
-
-export default App
