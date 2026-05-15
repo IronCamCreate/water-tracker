@@ -1,3 +1,12 @@
+html, body {
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+  width: 100%;
+  background: linear-gradient(135deg, #0a4f7a 0%, #1a8fc4 50%, #4dbde8 100%);
+  overflow-x: hidden;
+}
+
 * {
   margin: 0;
   padding: 0;
@@ -7,7 +16,7 @@
 body {
   min-height: 100vh;
   background: linear-gradient(135deg, #0a4f7a 0%, #1a8fc4 50%, #4dbde8 100%);
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-family: 'Nunito', sans-serif;
   display: flex;
   justify-content: center;
   align-items: flex-start;
@@ -17,6 +26,7 @@ body {
 .app {
   width: 100%;
   max-width: 420px;
+  min-height: 100vh;
 }
 
 .container {
@@ -180,4 +190,10 @@ header .date {
 .bar-label {
   font-size: 11px;
   opacity: 0.7;
+}
+
+#root {
+  min-height: 100vh;
+  width: 100%;
+  background: linear-gradient(135deg, #0a4f7a 0%, #1a8fc4 50%, #4dbde8 100%);
 }

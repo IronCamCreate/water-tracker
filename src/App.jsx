@@ -7,7 +7,7 @@ export default function App() {
   const [streak, setStreak] = useState(0);
   const [goal, setGoal] = useState(100);
 
-  const today = new Date().toISOString().split('T')[0];
+  const today = new Date().toLocaleDateString('en-CA');
 
   useEffect(() => {
     const saved = localStorage.getItem('waterTrackerData');
@@ -86,9 +86,8 @@ export default function App() {
     <div className="app">
       <div className="container">
         <header>
-          <h1>Water Tracker</h1>
-          <p className="date">{new Date(today).toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' })}</p>
-        </header>
+          <h1>Acqua Tracker</h1>
+          <p className="date">{new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' })}</p>        </header>
 
         <section className="progress-section">
           <div className="progress-card">
