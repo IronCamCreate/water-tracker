@@ -78,6 +78,10 @@ export default function App() {
     return count;
   };
 
+  const resetToday = () => {
+  setIntakes(intakes.filter(entry => entry.date !== today));
+};
+
   return (
     <div className="app">
       <div className="container">
@@ -106,6 +110,9 @@ export default function App() {
             const custom = prompt('Enter amount in oz:');
             if (custom && !isNaN(custom)) addWater(parseFloat(custom));
           }}>Custom</button>
+          <button onClick={() => {
+            if (confirm('Reset today\'s intake?')) resetToday();
+          }} style={{ gridColumn: 'span 2', background: 'rgba(255,255,255,0.1)' }}>Reset today</button>
         </section>
 
         <section className="streak-section">
