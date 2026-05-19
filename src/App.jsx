@@ -5,7 +5,7 @@ export default function App() {
   const [intakes, setIntakes] = useState([]);
   const [todayIntake, setTodayIntake] = useState(0);
   const [streak, setStreak] = useState(0);
-  const [goal, setGoal] = useState(100);
+  const [goal, setGoal] = useState(85);
 
   const today = new Date().toLocaleDateString('en-CA');
 
@@ -102,9 +102,9 @@ export default function App() {
         </section>
 
         <section className="buttons-section">
-          <button onClick={() => addWater(8)}>+ 8 oz</button>
-          <button onClick={() => addWater(16)}>+ 16 oz</button>
-          <button onClick={() => addWater(32)}>+ 32 oz</button>
+          <button onClick={() => addWater(8)}>☕ 8 oz</button>
+          <button onClick={() => addWater(20)}>🥤 20 oz</button>
+          <button onClick={() => addWater(30)}>💧 30 oz</button>
           <button onClick={() => {
             const custom = prompt('Enter amount in oz:');
             if (custom && !isNaN(custom)) addWater(parseFloat(custom));
