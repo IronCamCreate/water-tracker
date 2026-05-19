@@ -20,9 +20,17 @@ export default function App() {
   }, []);
 
   useEffect(() => {
-    const todayEntry = intakes.find(entry => entry.date === today);
-    setTodayIntake(todayEntry ? todayEntry.amount : 0);
-  }, [intakes, today]);
+  const saved = localStorage.getItem('waterTrackerData');
+  if (saved) {
+    const data = JSON.parse(saved);
+    setIntakes(data.intakes || []);
+    setStreak(data.streak || 0);
+    // Only restore goal if user has explicitly set it
+    if (data.userSetGoal) {
+      setGoal(data.goal || 85);
+    }
+  }
+}, []);
 
   useEffect(() => {
     localStorage.setItem('waterTrackerData', JSON.stringify({ intakes, streak, goal }));
