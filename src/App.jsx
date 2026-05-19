@@ -15,26 +15,20 @@ export default function App() {
       const data = JSON.parse(saved);
       setIntakes(data.intakes || []);
       setStreak(data.streak || 0);
-      setGoal(data.goal || 100);
+      if (data.userSetGoal) {
+        setGoal(data.goal || 85);
+      }
     }
   }, []);
 
   useEffect(() => {
-  const saved = localStorage.getItem('waterTrackerData');
-  if (saved) {
-    const data = JSON.parse(saved);
-    setIntakes(data.intakes || []);
-    setStreak(data.streak || 0);
-    // Only restore goal if user has explicitly set it
-    if (data.userSetGoal) {
-      setGoal(data.goal || 85);
-    }
-  }
-}, []);
+    const todayEntry = intakes.find(entry => entry.date === today);
+    setTodayIntake(todayEntry ? todayEntry.amount : 0);
+  }, [intakes, today]);
 
   useEffect(() => {
-  localStorage.setItem('waterTrackerData', JSON.stringify({ intakes, streak, goal, userSetGoal: goal !== 85 }));
-}, [intakes, streak, goal]);
+    localStorage.setItem('waterTrackerData', JSON.stringify({ intakes, streak, goal, userSetGoal: goal !== 85 }));
+  }, [intakes, streak, goal]);
 
   const addWater = (amount) => {
     const todayEntry = intakes.find(entry => entry.date === today);
@@ -49,8 +43,10 @@ export default function App() {
     } else {
       setIntakes([...intakes, { date: today, amount }]);
     }
-  }; const hitGoalToday = () => {
-    return todayIntake >= goal;
+  };
+
+  const resetToday = () => {
+    setIntakes(intakes.filter(entry => entry.date !== today));
   };
 
   const getWeeklyData = () => {
@@ -59,7 +55,7 @@ export default function App() {
     for (let i = 6; i >= 0; i--) {
       const date = new Date();
       date.setDate(date.getDate() - i);
-      const dateStr = date.toISOString().split('T')[0];
+      const dateStr = date.toLocaleDateString('en-CA');
       const entry = intakes.find(e => e.date === dateStr);
       result.push({
         day: days[date.getDay()],
@@ -74,7 +70,7 @@ export default function App() {
     let count = 0;
     const date = new Date();
     while (true) {
-      const dateStr = date.toISOString().split('T')[0];
+      const dateStr = date.toLocaleDateString('en-CA');
       const entry = intakes.find(e => e.date === dateStr);
       if (entry && entry.amount >= goal) {
         count++;
@@ -86,16 +82,13 @@ export default function App() {
     return count;
   };
 
-  const resetToday = () => {
-  setIntakes(intakes.filter(entry => entry.date !== today));
-};
-
   return (
     <div className="app">
       <div className="container">
         <header>
           <h1>Acqua Tracker</h1>
-          <p className="date">{new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' })}</p>        </header>
+          <p className="date">{new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' })}</p>
+        </header>
 
         <section className="progress-section">
           <div className="progress-card">
@@ -136,7 +129,7 @@ export default function App() {
               <div key={i} className="bar-container">
                 <div
                   className={`bar ${entry.hitGoal ? 'hit-goal' : ''}`}
-                  style={{ height: `${Math.max ((entry.amount / goal) * 100, 5)}%` }}
+                  style={{ height: `${Math.max((entry.amount / goal) * 100, 5)}%` }}
                 ></div>
                 <span className="bar-label">{entry.day}</span>
               </div>
