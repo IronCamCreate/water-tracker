@@ -33,8 +33,8 @@ export default function App() {
 }, []);
 
   useEffect(() => {
-    localStorage.setItem('waterTrackerData', JSON.stringify({ intakes, streak, goal }));
-  }, [intakes, streak, goal]);
+  localStorage.setItem('waterTrackerData', JSON.stringify({ intakes, streak, goal, userSetGoal: goal !== 85 }));
+}, [intakes, streak, goal]);
 
   const addWater = (amount) => {
     const todayEntry = intakes.find(entry => entry.date === today);
